@@ -20,7 +20,8 @@ public class Telefone {
         if (telefone == null || !telefone.matches("\\d{10,11}")) {
 
             throw new IllegalArgumentException(
-                    "Telefone deve conter 10 ou 11 dígitos."
+                    "Telefone " + telefone +
+                            "deve conter 10 ou 11 dígitos."
             );
         }
         this.telefone = telefone;

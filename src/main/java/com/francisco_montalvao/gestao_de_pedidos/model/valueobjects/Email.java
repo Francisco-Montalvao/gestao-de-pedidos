@@ -19,7 +19,7 @@ public class Email {
 
     public Email(String email) {
         if (email == null ||email.trim().length() < 5 || !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            throw new IllegalArgumentException("O e-mail não é válido.");
+            throw new IllegalArgumentException("O e-mail "+ email +" não é válido.");
         }
         this.email = email;
     }

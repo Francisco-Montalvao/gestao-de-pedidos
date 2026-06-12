@@ -20,7 +20,8 @@ public class Nome {
         if (nome == null || nome.trim().length() < 3 || !nome.matches("^[A-Za-zÀ-ÿ ]+$")){
 
             throw new IllegalArgumentException(
-                    "Nome deve conter apenas letras e ter no minimo 3 caracteres"
+                    "Nome " + nome +
+                            "deve conter apenas letras e ter no minimo 3 caracteres"
             );
         }
         this.nome = nome;
