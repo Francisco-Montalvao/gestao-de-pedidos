@@ -1,10 +1,14 @@
 package com.francisco_montalvao.gestao_de_pedidos.model;
 
 
+import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.Nome;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 @Entity
 @Table(name = "categorias")
@@ -14,22 +18,7 @@ public class Categoria {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Embedded
+    private Nome nome;
 
-    @Column(name = "nome", nullable = false, length = 50)
-    private String nome;
-
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
 }

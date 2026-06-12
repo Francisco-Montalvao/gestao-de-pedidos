@@ -2,8 +2,16 @@ package com.francisco_montalvao.gestao_de_pedidos.model;
 
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id")
 
 @Entity
 @Table(name = "itens_pedido")
@@ -27,44 +35,33 @@ public class ItemPedido {
     @Column(name = "preco_unitario", nullable = false)
     private BigDecimal precoUnitario;
 
+    public ItemPedido(Pedido pedido, Produto produto, Integer quantidade) {
+        validarPedido(pedido);
+        validarProduto(produto);
+        validarQuantidade(quantidade);
 
-    public Long getId() {
-        return id;
-    }
-
-    public Pedido getPedido() {
-        return pedido;
-    }
-
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public Integer getQuantidade() {
-        return quantidade;
-    }
-
-    public BigDecimal getPrecoUnitario() {
-        return precoUnitario;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setPedido(Pedido pedido) {
         this.pedido = pedido;
-    }
-
-    public void setProduto(Produto produto) {
         this.produto = produto;
-    }
-
-    public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
+        this.precoUnitario = produto.getPreco();
     }
 
-    public void setPrecoUnitario(BigDecimal precoUnitario) {
-        this.precoUnitario = precoUnitario;
+    private void validarPedido(Pedido pedido) {
+        if (pedido == null) {
+            throw new IllegalArgumentException("Pedido invalido");
+        }
     }
+
+    private void validarProduto(Produto produto) {
+        if (produto == null) {
+            throw new IllegalArgumentException("Produto invalido");
+        }
+    }
+
+    private void validarQuantidade(Integer quantidade){
+        if(quantidade <= 0){
+            throw new IllegalArgumentException("Quantidade deve ser maior que 0");
+        }
+    }
+
 }
