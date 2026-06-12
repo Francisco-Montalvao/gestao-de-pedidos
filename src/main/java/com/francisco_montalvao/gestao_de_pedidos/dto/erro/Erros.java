@@ -1,4 +1,7 @@
 package com.francisco_montalvao.gestao_de_pedidos.dto.erro;
 
-public class Erros {
+public record Erros(
+        String campo,
+        String mensagem
+) {
 }
