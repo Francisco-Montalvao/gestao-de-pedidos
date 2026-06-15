@@ -21,4 +21,8 @@ public class Categoria {
     @Embedded
     private Nome nome;
 
+    public Categoria(String nome){
+        this.nome = new Nome(nome);
+    }
+
 }
