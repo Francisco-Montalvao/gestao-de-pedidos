@@ -1,7 +1,8 @@
 package com.francisco_montalvao.gestao_de_pedidos.model;
 
 
-import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.Nome;
+import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.NomeComercial;
+import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.NomePessoa;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public class Produto {
     private Long id;
 
     @Embedded
-    private Nome nome;
+    private NomeComercial nome;
 
     @Column(name = "descricao")
     private String descricao;
@@ -51,19 +52,13 @@ public class Produto {
         validarPreco(preco);
         validarEstoque(estoque);
 
-        this.nome = new Nome(nome);
+        this.nome = new NomeComercial(nome);
         this.descricao = descricao;
         this.preco = preco;
         this.estoque = estoque;
         this.categoria = categoria;
 
         criadoEm = LocalDateTime.now();
-    }
-
-    private void validarNome(String nome){
-        if (nome == null || nome.trim().isEmpty()){
-            throw new IllegalArgumentException("O nome nao pode ser vazio");
-        }
     }
 
     private void validarPreco(BigDecimal preco){
@@ -100,5 +95,23 @@ public class Produto {
             throw new IllegalArgumentException("Estoque insuficiente");
         }
         this.estoque-=quantidadeVendida;
+    }
+
+
+
+    public void atualizarInformacoes(String nome, String descricao, BigDecimal preco, Integer estoque, Categoria categoria) {
+        this.nome = new NomeComercial(nome);
+        this.descricao = descricao;
+        this.preco = preco;
+        this.estoque = estoque;
+        this.categoria = categoria;
+    }
+
+    public void ativarProduto() {
+        this.ativo = true;
+    }
+
+    public void inativarProduto(){
+        this.ativo = false;
     }
 }

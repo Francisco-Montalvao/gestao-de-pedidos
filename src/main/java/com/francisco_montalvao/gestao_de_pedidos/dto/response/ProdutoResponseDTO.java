@@ -1,4 +1,14 @@
 package com.francisco_montalvao.gestao_de_pedidos.dto.response;
 
-public class ProdutoResponseDTO {
+import java.math.BigDecimal;
+
+public record ProdutoResponseDTO(
+        Long id,
+        String nome,
+        String descricao,
+        BigDecimal preco,
+        Integer estoque,
+        Long categoriaId,
+        Boolean ativo
+) {
 }
