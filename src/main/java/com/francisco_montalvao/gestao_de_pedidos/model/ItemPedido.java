@@ -64,4 +64,8 @@ public class ItemPedido {
         }
     }
 
+    public BigDecimal getSubtotal() {
+        return this.precoUnitario.multiply(BigDecimal.valueOf(this.quantidade));
+    }
+
 }
