@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 public record ClienteRequestDTO(
 
         @NotBlank
-        @Size(min = 3, message = "Nome deve conter mais de duas letras")
+        @Size(min = 3, message = "NomePessoa deve conter mais de duas letras")
         String nome,
 
         @NotBlank
@@ -18,12 +18,5 @@ public record ClienteRequestDTO(
         @Size(min = 10, max = 11, message = "Telefone invalido")
         String telefone
 ) {
-        public static Cliente toEntity(ClienteRequestDTO dto){
-                return new Cliente(
-                        dto.nome,
-                        dto.email,
-                        dto.telefone
-                );
-        }
 
 }

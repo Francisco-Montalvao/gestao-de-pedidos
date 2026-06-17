@@ -10,7 +10,7 @@ public record CategoriaResponseDTO(
         public static CategoriaResponseDTO toDTO(Categoria categoria){
                 return new CategoriaResponseDTO(
                         categoria.getId(),
-                        categoria.getNome().getNome()
+                        categoria.getNome().nome()
                 );
         }
 }

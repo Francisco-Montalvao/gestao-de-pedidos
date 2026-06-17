@@ -26,6 +26,9 @@ public class CategoriaService {
 
     @Transactional
     public CategoriaResponseDTO cadastrarCategoria(CategoriaRequestDTO requestDTO){
+        if (repository.existsByNome(requestDTO.nome())){
+            throw new RegraNegocioException("Já existe uma categoria cadastrada com esse nome", HttpStatus.CONFLICT);
+        }
         var cat = new Categoria(requestDTO.nome());
 
         var categoriaSalva = repository.save(cat);

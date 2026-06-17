@@ -1,7 +1,8 @@
 package com.francisco_montalvao.gestao_de_pedidos.model;
 
 
-import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.Nome;
+import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.NomeComercial;
+import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.NomePessoa;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -19,10 +20,10 @@ public class Categoria {
     private Long id;
 
     @Embedded
-    private Nome nome;
+    private NomeComercial nome;
 
     public Categoria(String nome){
-        this.nome = new Nome(nome);
+        this.nome = new NomeComercial(nome);
     }
 
 }

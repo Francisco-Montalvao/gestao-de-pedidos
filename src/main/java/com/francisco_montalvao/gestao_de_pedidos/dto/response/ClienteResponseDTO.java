@@ -17,9 +17,9 @@ public record ClienteResponseDTO(
     public static ClienteResponseDTO toDTO(Cliente cliente){
         return new ClienteResponseDTO(
                 cliente.getId(),
-                cliente.getNome().getNome(),
-                cliente.getEmail().getEmail(),
-                cliente.getTelefone().getTelefone(),
+                cliente.getNomePessoa().nome(),
+                cliente.getEmail().email(),
+                cliente.getTelefone().telefone(),
                 null,
                 cliente.getCriadoEm()
         );
