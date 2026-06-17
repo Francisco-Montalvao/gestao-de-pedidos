@@ -2,7 +2,7 @@ package com.francisco_montalvao.gestao_de_pedidos.model;
 
 
 import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.Email;
-import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.Nome;
+import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.NomePessoa;
 import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.Telefone;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -28,7 +28,7 @@ public class Cliente {
     private Long id;
 
     @Embedded
-    private Nome nome;
+    private NomePessoa nomePessoa;
 
     @Embedded
     private Email email;
@@ -44,13 +44,13 @@ public class Cliente {
     private List<Pedido> pedidos = new ArrayList<>();
 
     public Cliente(String nome, String email, String telefone) {
-        this.nome = new Nome(nome);
+        this.nomePessoa = new NomePessoa(nome);
         this.email = new Email(email);
         this.telefone = new Telefone(telefone);
     }
 
     public void atualizarNome(String novoNome) {
-        this.nome = new Nome(novoNome);
+        this.nomePessoa = new NomePessoa(novoNome);
     }
 
     public void atualizarEmail(String email) {
