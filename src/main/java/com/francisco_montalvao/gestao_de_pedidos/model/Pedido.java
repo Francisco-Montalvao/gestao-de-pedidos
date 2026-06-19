@@ -66,11 +66,12 @@ public class Pedido {
     }
 
     public void adicionarItem(ItemPedido itemPedido){
-       if (itemPedido == null){
-           throw new IllegalArgumentException("Erro item invalido");
-       }
-        itensPedido.add(itemPedido);
-        valorTotal = calcularValorTotal();
+
+            if ( itemPedido == null){
+                throw new IllegalArgumentException("Erro item invalido");
+            }
+            itensPedido.add(itemPedido);
+            valorTotal = calcularValorTotal();
     }
 
     public void removerItem(ItemPedido itemPedido){
@@ -84,4 +85,16 @@ public class Pedido {
         valorTotal = calcularValorTotal();
     }
 
+    public void avancarStatus(String novoStatus) {
+        var status = StatusPedido.valueOf(novoStatus);
+
+        if (!this.status.podeTransicionarPara(status)) {
+            throw new IllegalArgumentException(
+                    "Transição inválida: o pedido está " + this.status +
+                            " e não pode mudar para " + status +
+                            ". Os próximos passos permitidos são: " + this.status.obterProximosPassos()
+            );
+        }
+        this.status = status;
+    }
 }

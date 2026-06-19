@@ -92,7 +92,7 @@ public class Produto {
     public void saidaEstoque(Integer quantidadeVendida){
         validarQuantidadeMovimentacao(quantidadeVendida);
         if (getEstoque() < quantidadeVendida){
-            throw new IllegalArgumentException("Estoque insuficiente");
+            throw new IllegalArgumentException("Estoque insuficiente paro o produto "+ this.nome.nome());
         }
         this.estoque-=quantidadeVendida;
     }
