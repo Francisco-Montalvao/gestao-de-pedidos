@@ -1,5 +1,6 @@
 package com.francisco_montalvao.gestao_de_pedidos.service;
 
+import com.francisco_montalvao.gestao_de_pedidos.dto.request.PedidoFiltroRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.request.PedidoRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.request.StatusRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.response.ClienteSimplificadoDTO;
@@ -11,15 +12,16 @@ import com.francisco_montalvao.gestao_de_pedidos.model.Cliente;
 import com.francisco_montalvao.gestao_de_pedidos.model.ItemPedido;
 import com.francisco_montalvao.gestao_de_pedidos.model.Pedido;
 import com.francisco_montalvao.gestao_de_pedidos.model.Produto;
-import com.francisco_montalvao.gestao_de_pedidos.model.enums.StatusPedido;
 import com.francisco_montalvao.gestao_de_pedidos.repository.ClienteRepository;
 import com.francisco_montalvao.gestao_de_pedidos.repository.PedidoRepository;
 import com.francisco_montalvao.gestao_de_pedidos.repository.ProdutoRepository;
+import com.francisco_montalvao.gestao_de_pedidos.specification.PedidoSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -54,6 +56,7 @@ public class PedidoService {
                     HttpStatus.BAD_REQUEST
             );
         }
+
         Pedido pedido = new Pedido(cliente);
 
         for (var itemDto : dto.itens()) {
@@ -64,9 +67,10 @@ public class PedidoService {
             ItemPedido itemPedido = new ItemPedido(pedido, produto, itemDto.quantidade());
 
             pedido.adicionarItem(itemPedido);
-
         }
+
         Pedido pedidoSalvo = repository.save(pedido);
+
         return toResponseDto(pedidoSalvo);
     }
 
@@ -77,12 +81,10 @@ public class PedidoService {
 
     }
 
-    public List<PedidoResponseDTO> listarTodos() {
+    public Page<PedidoResponseDTO> listarTodos(PedidoFiltroRequestDTO filtro, Pageable pageable) {
         return repository
-                .buscarTodosComJpql()
-                .stream()
-                .map(this::toResponseDto)
-                .toList();
+                .findAll(PedidoSpecification.comFiltros(filtro), pageable)
+                .map(this::toResponseDto);
 
     }
 
@@ -104,9 +106,9 @@ public class PedidoService {
 
     @Transactional
     public void deletarPedido(Long id) {
+        var pedido = buscarPedidoPorId(id);
 
-
-        
+        pedido.avancarStatus("CANCELADO");
     }
 
     private Pedido buscarPedidoPorId(Long id) {
