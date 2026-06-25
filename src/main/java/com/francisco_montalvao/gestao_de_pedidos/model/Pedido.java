@@ -67,10 +67,17 @@ public class Pedido {
 
     public void adicionarItem(ItemPedido itemPedido){
 
-            if ( itemPedido == null){
+            if ( itemPedido == null ){
                 throw new IllegalArgumentException("Erro item invalido");
             }
+
+            if (!itemPedido.getProduto().getAtivo()){
+                throw new IllegalArgumentException("O produto "+ itemPedido.getProduto().getNome().nome() +" está inativo e não pode ser adicionado ao pedido.");
+            }
+
+
             itensPedido.add(itemPedido);
+
             valorTotal = calcularValorTotal();
     }
 
@@ -95,6 +102,13 @@ public class Pedido {
                             ". Os próximos passos permitidos são: " + this.status.obterProximosPassos()
             );
         }
+
+        if (status.equals(StatusPedido.CANCELADO)){
+            for (var item : itensPedido){
+                item.getProduto().entradaEstoque(item.getQuantidade());
+            }
+        }
         this.status = status;
     }
+
 }

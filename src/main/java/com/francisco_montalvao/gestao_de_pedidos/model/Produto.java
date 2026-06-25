@@ -47,6 +47,7 @@ public class Produto {
     @CreationTimestamp
     @Column(name = "criado_em")
     private LocalDateTime criadoEm;
+    
 
     public Produto(String nome, String descricao, BigDecimal preco, Integer estoque, Categoria categoria){
         validarPreco(preco);
