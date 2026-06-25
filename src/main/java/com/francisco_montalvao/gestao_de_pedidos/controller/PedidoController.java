@@ -1,12 +1,15 @@
 package com.francisco_montalvao.gestao_de_pedidos.controller;
 
 
+import com.francisco_montalvao.gestao_de_pedidos.dto.request.PedidoFiltroRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.request.PedidoRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.request.StatusRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.response.PedidoResponseDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.response.StatusResponseDTO;
 import com.francisco_montalvao.gestao_de_pedidos.service.PedidoService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,10 +40,13 @@ public class PedidoController {
         return ResponseEntity.created(uri).body(response);
     }
 
+
+
     @GetMapping
-    public ResponseEntity<List<PedidoResponseDTO>> listarTodos (){
-        return ResponseEntity.ok(service.listarTodos());
+    public Page<PedidoResponseDTO> listarTodos (PedidoFiltroRequestDTO filtro, Pageable pageable){
+        return service.listarTodos(filtro, pageable);
     }
+
 
     @GetMapping("/{id}")
     public  ResponseEntity<PedidoResponseDTO> listarPorId(@PathVariable Long id){
