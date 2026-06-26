@@ -27,9 +27,11 @@ public class PedidoController {
         this.service = service;
     }
 
-
     @PostMapping
-    public ResponseEntity<PedidoResponseDTO> cadastrarPedido(@RequestBody @Valid PedidoRequestDTO dto, UriComponentsBuilder uriComponentsBuilder){
+    public ResponseEntity<PedidoResponseDTO> cadastrarPedido(
+            @RequestBody
+            @Valid PedidoRequestDTO dto,
+            UriComponentsBuilder uriComponentsBuilder){
         var response = service.cadastrarPedido(dto);
 
         URI uri = uriComponentsBuilder
@@ -40,19 +42,15 @@ public class PedidoController {
         return ResponseEntity.created(uri).body(response);
     }
 
-
-
     @GetMapping
     public Page<PedidoResponseDTO> listarTodos (PedidoFiltroRequestDTO filtro, Pageable pageable){
         return service.listarTodos(filtro, pageable);
     }
 
-
     @GetMapping("/{id}")
     public  ResponseEntity<PedidoResponseDTO> listarPorId(@PathVariable Long id){
         return ResponseEntity.ok(service.listarPorId(id));
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarPedido (@PathVariable Long id){
@@ -67,3 +65,4 @@ public class PedidoController {
         return ResponseEntity.ok(status);
     }
 }
+

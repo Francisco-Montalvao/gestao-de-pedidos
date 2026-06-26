@@ -1,15 +1,17 @@
 package com.francisco_montalvao.gestao_de_pedidos.controller;
 
+import com.francisco_montalvao.gestao_de_pedidos.dto.request.FiltroCategoriaRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.request.ProdutoRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.response.ProdutoResponseDTO;
 import com.francisco_montalvao.gestao_de_pedidos.service.ProdutoService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/produtos")
@@ -21,7 +23,10 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public ResponseEntity<ProdutoResponseDTO> cadastrarProduto(@RequestBody @Valid ProdutoRequestDTO dto, UriComponentsBuilder uriComponentsBuilder){
+    public ResponseEntity<ProdutoResponseDTO> cadastrarProduto(
+            @RequestBody
+            @Valid ProdutoRequestDTO dto,
+            UriComponentsBuilder uriComponentsBuilder) {
         var response = service.cadastrarProduto(dto);
 
         URI uri = uriComponentsBuilder
@@ -32,26 +37,35 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProdutoResponseDTO>> listarTodosProdutos (){
-        return ResponseEntity.ok(service.listarTodos());
+    public Page<ProdutoResponseDTO> listarTodosProdutos(
+            FiltroCategoriaRequestDTO filtro,
+            Pageable pageable) {
+
+        return service.listarTodos(filtro, pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> listarPorId(@PathVariable Long id){
+    public ResponseEntity<ProdutoResponseDTO> listarPorId(@PathVariable Long id) {
         var response = service.listarPorId(id);
 
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> atualizarProduto(@PathVariable Long id, @RequestBody ProdutoRequestDTO dto){
+    public ResponseEntity<ProdutoResponseDTO> atualizarProduto(
+            @PathVariable
+            Long id,
+            @RequestBody
+            ProdutoRequestDTO dto) {
         var response = service.atualizarProduto(id, dto);
 
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarProduto (@PathVariable Long id){
+    public ResponseEntity<Void> deletarProduto(
+            @PathVariable
+            Long id) {
 
         service.inativarProduto(id);
 
@@ -59,7 +73,7 @@ public class ProdutoController {
     }
 
     @PatchMapping("/{id}/reativar")
-    public ResponseEntity<Void> reativarProduto(@PathVariable Long id){
+    public ResponseEntity<Void> reativarProduto(@PathVariable Long id) {
         service.reativarProduto(id);
         return ResponseEntity.noContent().build();
     }
