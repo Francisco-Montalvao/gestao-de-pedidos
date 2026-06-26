@@ -17,20 +17,22 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long>, JpaSpecif
 
 
     @Query("""
-                               SELECT  DISTINCT p FROM Pedido p 
-                               JOIN FETCH p.cliente 
-                               JOIN FETCH p.itensPedido itens
-                               JOIN FETCH itens.produto
+            SELECT  DISTINCT p FROM Pedido p 
+            JOIN FETCH p.cliente 
+            JOIN FETCH p.itensPedido itens
+            JOIN FETCH itens.produto
             """)
     List<Pedido> buscarTodosComJpql();
 
 
     @Query("""
-        SELECT DISTINCT p FROM Pedido p
-        JOIN FETCH p.cliente
-        JOIN FETCH p.itensPedido itens
-        JOIN FETCH itens.produto
-        WHERE p.id = :id
-      \s""")
+            SELECT DISTINCT p FROM Pedido p
+            JOIN FETCH p.cliente
+            JOIN FETCH p.itensPedido itens
+            JOIN FETCH itens.produto
+            WHERE p.id = :id
+            """)
     Optional<Pedido> buscarPorIdComJpql(@Param("id") Long id);
+
+
 }

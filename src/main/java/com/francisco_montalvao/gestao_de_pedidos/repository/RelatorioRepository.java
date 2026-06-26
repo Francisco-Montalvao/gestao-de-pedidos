@@ -2,10 +2,7 @@ package com.francisco_montalvao.gestao_de_pedidos.repository;
 
 
 import com.francisco_montalvao.gestao_de_pedidos.model.Pedido;
-import com.francisco_montalvao.gestao_de_pedidos.projection.ProdutosMaisVendidosProjection;
-import com.francisco_montalvao.gestao_de_pedidos.projection.RelatorioCategoriaReceitaProjection;
-import com.francisco_montalvao.gestao_de_pedidos.projection.ResumoPorDiaProjection;
-import com.francisco_montalvao.gestao_de_pedidos.projection.ResumoStatusProjection;
+import com.francisco_montalvao.gestao_de_pedidos.projection.*;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
@@ -89,5 +86,24 @@ public interface RelatorioRepository extends Repository<Pedido, Long> {
             @Param("fim") LocalDateTime fim
     );
 
+    @Query("""
+            SELECT c.id AS id, 
+                   c.nomePessoa.nome AS nome, 
+                   COUNT(p.id) AS totalPedidos, 
+                   SUM(p.valorTotal) AS receitaTotal, 
+                   AVG(p.valorTotal) AS ticketMedio, 
+                   ROW_NUMBER() OVER(ORDER BY SUM(p.valorTotal) DESC) AS posicao
+            FROM Pedido p
+            JOIN p.cliente c
+            WHERE p.criadoEm >= :inicio 
+              AND p.criadoEm <= :fim
+              AND p.status != 'CANCELADO'
+            GROUP BY c.id, c.nomePessoa.nome
+            ORDER BY receitaTotal DESC
+            """)
+    List<RelatorioVendasTicketMedioClienteProjection> relatorioTicketMedioPorCliente(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim
+    );
 
 }
