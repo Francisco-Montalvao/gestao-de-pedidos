@@ -3,11 +3,13 @@ package com.francisco_montalvao.gestao_de_pedidos.service;
 
 import com.francisco_montalvao.gestao_de_pedidos.dto.response.*;
 import com.francisco_montalvao.gestao_de_pedidos.model.enums.StatusPedido;
+import com.francisco_montalvao.gestao_de_pedidos.projection.RelatorioCategoriaReceitaProjection;
 import com.francisco_montalvao.gestao_de_pedidos.repository.RelatorioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -117,11 +119,8 @@ public class RelatorioService {
         );
     }
 
-
     public RelatorioPorCategoriaDTO receitaPorCategoria(LocalDate inicio, LocalDate fim) {
-        var linhas = repository.produtosMaisVendidos(datas.inicio(inicio), datas.fim(fim));
-
-
+        var linhas = repository.vendasPorCategoria(datas.inicio(inicio), datas.fim(fim));
 
         var categorias = new ArrayList<RelatorioCategoriaReceita>(linhas.size());
         var receita = BigDecimal.ZERO;
@@ -148,13 +147,33 @@ public class RelatorioService {
     }
 
 
-    private static class datas{
+    public RelatorioClienteTicketMedio relatorioTicketMedioPorCliente(LocalDate inicio, LocalDate fim) {
+        var response = repository.relatorioTicketMedioPorCliente(datas.inicio(inicio), datas.fim(fim));
 
-        private static LocalDateTime inicio(LocalDate inicio){
+        var clientes = response.stream()
+                .map(item -> new ClienteTicketMedio(
+                        item.getPosicao(),
+                        item.getId(),
+                        item.getNome(),
+                        item.getTotalPedidos(),
+                        item.getReceitaTotal(),
+                        item.getTicketMedio()))
+                .toList();
+
+        return new RelatorioClienteTicketMedio(
+                new PeriodoResponseDTO(inicio, fim),
+                clientes
+        );
+    }
+
+
+    private static class datas {
+
+        private static LocalDateTime inicio(LocalDate inicio) {
             return inicio.atTime(LocalTime.MIN);
         }
 
-        private static LocalDateTime fim(LocalDate fim){
+        private static LocalDateTime fim(LocalDate fim) {
             return fim.atTime(LocalTime.MAX);
         }
     }

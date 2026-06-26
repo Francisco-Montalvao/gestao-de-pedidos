@@ -78,8 +78,14 @@ public class PedidoService {
         var response = buscarPedidoPorId(id);
 
         return toResponseDto(response);
-
     }
+
+    public List<PedidoResponseDTO> findAll(){
+        return repository.findAll().stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
 
     public Page<PedidoResponseDTO> listarTodos(PedidoFiltroRequestDTO filtro, Pageable pageable) {
         return repository
