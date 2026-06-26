@@ -31,6 +31,7 @@ public class Cliente {
     private NomePessoa nomePessoa;
 
     @Embedded
+    @Column(name = "email", unique = true)
     private Email email;
 
     @Embedded
