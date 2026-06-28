@@ -1,116 +1,107 @@
-# Gestão de Pedidos API
+# 📦 Gestão de Pedidos API
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![Status](https://img.shields.io/badge/status-production--ready-brightgreen)
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 
-API RESTful para gerenciamento de um sistema de pedidos, desenvolvida como parte de um desafio de backend. O projeto abrange o cadastro de clientes, produtos, categorias e a gestão completa do ciclo de vida de um pedido.
+Uma API robusta e escalável para o gerenciamento de ciclos de vida de pedidos, construída com foco em **integridade de domínio** e **previsibilidade de comportamento**.
 
-## ✨ Sobre o Projeto
+## 🏗️ Arquitetura e Design
 
-Este projeto foi construído com foco em boas práticas de desenvolvimento e arquitetura de software, aplicando conceitos modernos para garantir um código limpo, manutenível e escalável.
+O projeto segue os princípios do **Domain-Driven Design (DDD)** e uma **Arquitetura em Camadas**, garantindo que a lógica de negócio seja isolada de preocupações de infraestrutura (como HTTP ou Banco de Dados).
 
-- **Arquitetura em Camadas (Layered Architecture):** O código é organizado nas camadas `Controller`, `Service` e `Repository`, separando as responsabilidades de API, regras de negócio e acesso a dados.
-- **Domain-Driven Design (DDD):** Foram aplicados conceitos de DDD, como:
-  - **Value Objects:** Tipos como `Email`, `Nome` e `Telefone` garantem que os dados do domínio sejam sempre válidos e imutáveis.
-  - **Rich Domain Model:** As entidades (`Pedido`, `Produto`) contêm a lógica de negócio que lhes pertence (ex: `darBaixaEstoque`, `cancelarPedido`), evitando modelos anêmicos.
-- **Tratamento de Exceções:** Um handler global (`@ControllerAdvice`) captura exceções de negócio e de validação, retornando respostas de erro padronizadas para o cliente.
-
----
-
-## 🚀 Funcionalidades Implementadas
-
-- ✅ **CRUD de Clientes:** Cadastro, listagem, busca, atualização e exclusão de clientes.
-- ✅ **Gestão de Pedidos:**
-  - Criação de novos pedidos, com validação de cliente e baixa automática de estoque dos produtos.
-  - Listagem e busca de pedidos.
-  - Cancelamento de pedidos, com estorno automático do estoque.
-  - Atualização de status do pedido.
-- ✅ **Controle de Estoque:** A lógica de estoque é gerenciada diretamente pelo modelo, garantindo consistência.
-- ✅ **Migrações de Banco de Dados:** O [Flyway](https://flywaydb.org/) é utilizado para versionar e aplicar as alterações no schema do banco de dados de forma automática.
-
----
-
-## 🛠️ Tecnologias Utilizadas
-
-- **Java 17**
-- **Spring Boot 3**
-- **Spring Data JPA**
-- **Maven** como gerenciador de dependências
-- **Flyway** para migrações de banco de dados
-- **H2 Database** como banco de dados em memória para desenvolvimento
-- **Lombok** para redução de código boilerplate
-
----
-
-## Endpoints da API
-
-### Clientes
-
-| Verbo  | Endpoint         | Descrição                  |
-| :----- | :--------------- | :------------------------- |
-| `POST` | `/clientes`      | Cadastra um novo cliente.  |
-| `GET`  | `/clientes`      | Lista todos os clientes.   |
-| `GET`  | `/clientes/{id}` | Busca um cliente por ID.   |
-| `PUT`  | `/clientes/{id}` | Atualiza um cliente.       |
-| `DELETE`| `/clientes/{id}`| Deleta um cliente.         |
-
-**Exemplo de body para `POST /clientes`:**
-```json
-{
-  "nome": "Carlos Mendes",
-  "email": "carlos.mendes@email.com",
-  "telefone": "38999112233"
-}
+### Fluxo de Requisição
+```mermaid
+graph LR
+    A[Client] -->|REST/JSON| B(Controller)
+    B -->|DTO| C(Service)
+    C -->|Domain Entity| D(Repository)
+    D -->|SQL| E[(PostgreSQL)]
+    
+    subgraph "Business Logic Layer"
+    C
+    end
+    
+    subgraph "Domain Layer (Rich Models)"
+    C
+    end
 ```
 
-### Pedidos
+### Pilares de Design
+- **Rich Domain Model:** Diferente de modelos anêmicos, nossas entidades (`Pedido`, `Produto`) são responsáveis por suas próprias regras de transição de estado. Isso impede que um pedido entre em um estado impossível (ex: de `CANCELADO` para `ENTREGUE`).
+- **Imutabilidade com Value Objects:** O uso de `Java Records` para tipos como `Email` e `Telefone` garante que, uma vez criados, os dados são imutáveis e sempre válidos.
+- **Fail-Fast Principle:** As validações ocorrem o mais cedo possível (no construtor do Value Object ou via Bean Validation no DTO), evitando o processamento de dados corrompidos.
 
-| Verbo   | Endpoint                   | Descrição                               |
-| :------ | :------------------------- | :-------------------------------------- |
-| `POST`  | `/pedidos`                 | Cria um novo pedido.                    |
-| `GET`   | `/pedidos`                 | Lista todos os pedidos.                 |
-| `GET`   | `/pedidos/{id}`            | Busca um pedido por ID.                 |
-| `PATCH` | `/pedidos/{id}/cancelar`   | Cancela um pedido e estorna o estoque.  |
-| `PATCH` | `/pedidos/{id}/status`     | Atualiza o status de um pedido.         |
+---
 
-**Exemplo de body para `POST /pedidos`:**
+## 🧪 Estratégia de Qualidade (QA)
+
+A confiança no sistema é garantida através de uma pirâmide de testes:
+
+1.  **Testes Unitários (Domínio):** Focados em testar a lógica de negócio dentro dos Records e Entidades, garantindo que as regras de estado e validações funcionem isoladamente.
+2.  **Testes de Integração (API):** Validam o fluxo completo, desde o endpoint REST até a persistência no banco de dados, garantindo a integridade das transações e das migrações do Flyway.
+
+---
+
+## 🚀 Funcionalidades Principais
+
+- 🔄 **Ciclo de Vida de Pedidos:** Gestão de estados com estorno automático de estoque em caso de cancelamento.
+- 🛡️ **Integridade de Estoque:** Proteção contra vendas de produtos com estoque insuficiente ou inativos.
+- 📊 **Analytics Engine:** Endpoints de alta performance para relatórios de receita e métricas de vendas por período.
+- 📑 **Versionamento de Schema:** Migrações controladas via Flyway para garantir consistência entre ambientes.
+
+---
+
+## 🛠️ Stack Tecnológica
+
+| Tecnologia | Uso |
+| :--- | :--- |
+| **Java 21** | Linguagem base (LTS) |
+| **Spring Boot 3** | Framework de aplicação |
+| **PostgreSQL** | Persistência de dados relacional |
+| **Flyway** | Evolução de schema (Database Migrations) |
+| **Maven** | Gestão de build e dependências |
+| **Jakarta Validation** | Garantia de integridade dos contratos |
+
+---
+
+## 📖 Guia de Uso
+
+### 🛠️ Configuração Local
+
+1. **Clone e Entre:**
+   ```sh
+   git clone <url-do-seu-repositorio> && cd gestao-de-pedidos
+   ```
+
+2. **Configuração do Banco:**
+   Certifique-se de que o PostgreSQL está rodando e ajuste as credenciais em `src/main/resources/application.properties`.
+
+3. **Execução:**
+   ```sh
+   mvn spring-boot:run
+   ```
+
+### 🔌 API Reference (Snippets)
+
+**Endpoint de Criação de Pedido (`POST /pedidos`)**
+*Respeita o padrão `snake_case`.*
+
 ```json
 {
-  "clienteId": 1,
+  "cliente_id": 1,
   "itens": [
-    {
-      "produtoId": 1,
-      "quantidade": 2
-    },
-    {
-      "produtoId": 10,
-      "quantidade": 1
-    }
+    { "produto_id": 10, "quantidade": 5 }
   ]
 }
 ```
 
 ---
 
-## ⚙️ Como Executar o Projeto
+## 🗺️ Roadmap de Evolução
 
-1.  **Clone o repositório:**
-    ```sh
-    git clone <url-do-seu-repositorio>
-    ```
-
-2.  **Navegue até o diretório do projeto:**
-    ```sh
-    cd gestao-de-pedidos
-    ```
-
-3.  **Execute a aplicação com o Maven:**
-    ```sh
-    mvn spring-boot:run
-    ```
-
-4.  A API estará disponível em `http://localhost:8080`.
-
-5.  **Acessar o banco de dados H2:**
-    - Acesse `http://localhost:8080/h2-console` no seu navegador.
-    - Use a URL JDBC `jdbc:h2:mem:gestao_de_pedidos`.
-    - Deixe o usuário como `sa` e a senha em branco.
+- [ ] **Security:** Implementação de OAuth2/JWT para proteção de endpoints sensíveis.
+- [ ] **Observability:** Integração com Micrometer e Prometheus para monitoramento de métricas.
+- [ ] **DevOps:** Pipeline de CI/CD com testes automatizados e deploy via Docker.
+```,file_path:
