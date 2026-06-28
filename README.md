@@ -5,103 +5,109 @@
 ![Spring Boot](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 
-Uma API robusta e escalável para o gerenciamento de ciclos de vida de pedidos, construída com foco em **integridade de domínio** e **previsibilidade de comportamento**.
+Uma API RESTful robusta para o gerenciamento de um sistema de pedidos, desenvolvida com foco em **integridade de domínio** e **previsibilidade de comportamento**.
 
-## 🏗️ Arquitetura e Design
+## ✨ Sobre o Projeto
 
-O projeto segue os princípios do **Domain-Driven Design (DDD)** e uma **Arquitetura em Camadas**, garantindo que a lógica de negócio seja isolada de preocupações de infraestrutura (como HTTP ou Banco de Dados).
+Este projeto foi construído aplicando conceitos modernos de engenharia de software para garantir um código limpo, manutenível e escalável.
 
-### Fluxo de Requisição
-```mermaid
-graph LR
-    A[Client] -->|REST/JSON| B(Controller)
-    B -->|DTO| C(Service)
-    C -->|Domain Entity| D(Repository)
-    D -->|SQL| E[(PostgreSQL)]
-    
-    subgraph "Business Logic Layer"
-    C
-    end
-    
-    subgraph "Domain Layer (Rich Models)"
-    C
-    end
-```
-
-### Pilares de Design
-- **Rich Domain Model:** Diferente de modelos anêmicos, nossas entidades (`Pedido`, `Produto`) são responsáveis por suas próprias regras de transição de estado. Isso impede que um pedido entre em um estado impossível (ex: de `CANCELADO` para `ENTREGUE`).
-- **Imutabilidade com Value Objects:** O uso de `Java Records` para tipos como `Email` e `Telefone` garante que, uma vez criados, os dados são imutáveis e sempre válidos.
-- **Fail-Fast Principle:** As validações ocorrem o mais cedo possível (no construtor do Value Object ou via Bean Validation no DTO), evitando o processamento de dados corrompidos.
+- **Arquitetura em Camadas (Layered Architecture):** Separação clara entre as camadas de `Controller` (Interface), `Service` (Regras de Negócio) e `Repository` (Acesso a Dados).
+- **Domain-Driven Design (DDD):**
+  - **Value Objects:** Utilização de `Java Records` para tipos como `Email`, `NomePessoa`, `NomeProduto` e `Telefone`, garantindo imutabilidade e validação de dados no momento da criação.
+  - **Rich Domain Model:** As entidades (`Pedido`, `Produto`) possuem lógica de negócio intrínseca (ex: transição de status, controle de estoque), evitando o antipadrão de modelos anêmicos.
+- **Tratamento de Exceções:** Implementação de um `@ControllerAdvice` para capturar exceções de negócio e retornar respostas padronizadas e amigáveis.
 
 ---
 
-## 🧪 Estratégia de Qualidade (QA)
+## 🚀 Funcionalidades Implementadas
 
-A confiança no sistema é garantida através de uma pirâmide de testes:
-
-1.  **Testes Unitários (Domínio):** Focados em testar a lógica de negócio dentro dos Records e Entidades, garantindo que as regras de estado e validações funcionem isoladamente.
-2.  **Testes de Integração (API):** Validam o fluxo completo, desde o endpoint REST até a persistência no banco de dados, garantindo a integridade das transações e das migrações do Flyway.
-
----
-
-## 🚀 Funcionalidades Principais
-
-- 🔄 **Ciclo de Vida de Pedidos:** Gestão de estados com estorno automático de estoque em caso de cancelamento.
-- 🛡️ **Integridade de Estoque:** Proteção contra vendas de produtos com estoque insuficiente ou inativos.
-- 📊 **Analytics Engine:** Endpoints de alta performance para relatórios de receita e métricas de vendas por período.
-- 📑 **Versionamento de Schema:** Migrações controladas via Flyway para garantir consistência entre ambientes.
+- ✅ **Gestão de Clientes:** CRUD completo com validação de dados.
+- ✅ **Gestão de Pedidos:** 
+  - Fluxo de criação com validação de disponibilidade de estoque.
+  - Gestão de ciclo de vida através de transições de status controladas.
+  - Cancelamento de pedidos com estorno automático de estoque.
+- ✅ **Controle de Estoque:** Gerenciamento integrado diretamente no modelo de domínio.
+- ✅ **Migrações de Banco de Dados:** Versionamento de schema profissional utilizando **Flyway**.
 
 ---
 
-## 🛠️ Stack Tecnológica
+## 🛠️ Tecnologias Utilizadas
 
 | Tecnologia | Uso |
 | :--- | :--- |
 | **Java 21** | Linguagem base (LTS) |
-| **Spring Boot 3** | Framework de aplicação |
-| **PostgreSQL** | Persistência de dados relacional |
-| **Flyway** | Evolução de schema (Database Migrations) |
-| **Maven** | Gestão de build e dependências |
+| **Spring Boot 3** | Framework principal |
+| **Spring Data JPA** | Persistência de dados |
+| **PostgreSQL** | Banco de dados relacional |
+| **Flyway** | Evolução de schema |
+| **Maven** | Gerenciador de dependências |
 | **Jakarta Validation** | Garantia de integridade dos contratos |
 
 ---
 
-## 📖 Guia de Uso
+## 📑 Endpoints da API
 
-### 🛠️ Configuração Local
+A API utiliza o padrão **snake_case** para todos os campos em JSON.
 
-1. **Clone e Entre:**
-   ```sh
-   git clone <url-do-seu-repositorio> && cd gestao-de-pedidos
-   ```
+### Clientes
+| Verbo  | Endpoint         | Descrição                  |
+| :----- | :--------------- | :------------------------- |
+| `POST` | `/clientes`      | Cadastra um novo cliente.  |
+| `GET`  | `/clientes`      | Lista todos os clientes.   |
+| `GET`  | `/clientes/{id}` | Busca um cliente por ID.   |
 
-2. **Configuração do Banco:**
-   Certifique-se de que o PostgreSQL está rodando e ajuste as credenciais em `src/main/resources/application.properties`.
+**Exemplo de corpo (`POST /clientes`):**
+```json
+{
+  "nome": "Carlos Mendes",
+  "email": "carlos.mendes@email.com",
+  "telefone": "38999112233"
+}
+```
 
-3. **Execução:**
-   ```sh
-   mvn spring-boot:run
-   ```
+### Pedidos
+| Verbo   | Endpoint                   | Descrição                               |
+| :------ | :------------------------- | :-------------------------------------- |
+| `POST`  | `/pedidos`                 | Cria um novo pedido.                    |
+| `GET`   | `/pedidos`                 | Lista todos os pedidos.                 |
+| `DELETE`| `/pedidos/{id}`            | Cancela um pedido (estorno de estoque). |
 
-### 🔌 API Reference (Snippets)
-
-**Endpoint de Criação de Pedido (`POST /pedidos`)**
-*Respeita o padrão `snake_case`.*
-
+**Exemplo de corpo (`POST /pedidos`):**
 ```json
 {
   "cliente_id": 1,
   "itens": [
-    { "produto_id": 10, "quantidade": 5 }
+    {
+      "produto_id": 10,
+      "quantidade": 2
+    }
   ]
 }
 ```
 
 ---
 
+## ⚙️ Como Executar o Projeto
+
+1. **Clone o repositório:**
+   ```sh
+   git clone <url-do-seu-repositorio>
+   ```
+
+2. **Configuração:**
+   Ajuste as credenciais do banco de dados em `src/main/resources/application.properties`.
+
+3. **Execução:**
+   ```sh
+   mvn spring-boot:run
+   ```
+
+---
+
 ## 🗺️ Roadmap de Evolução
 
-- [ ] **Security:** Implementação de OAuth2/JWT para proteção de endpoints sensíveis.
-- [ ] **Observability:** Integração com Micrometer e Prometheus para monitoramento de métricas.
-- [ ] **DevOps:** Pipeline de CI/CD com testes automatizados e deploy via Docker.
+- [ ] **QA:** Implementação de suíte de testes (Unitários de domínio e Integração de API).
+- [ ] **Security:** Implementação de autenticação via JWT.
+- [ ] **Observability:** Integração com métricas e monitoramento.
+- [ ] **DevOps:** Containerização e Pipeline de CI/CD.
 ```,file_path:
