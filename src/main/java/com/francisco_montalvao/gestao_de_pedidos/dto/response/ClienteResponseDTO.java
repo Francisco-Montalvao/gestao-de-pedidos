@@ -1,6 +1,5 @@
 package com.francisco_montalvao.gestao_de_pedidos.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.francisco_montalvao.gestao_de_pedidos.model.Cliente;
 
 import java.time.LocalDateTime;
@@ -10,8 +9,6 @@ public record ClienteResponseDTO(
         String nome,
         String email,
         String telefone,
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        String path,
         LocalDateTime criadoEm
 ) {
     public static ClienteResponseDTO toDTO(Cliente cliente){
@@ -20,7 +17,6 @@ public record ClienteResponseDTO(
                 cliente.getNomePessoa().nome(),
                 cliente.getEmail().email(),
                 cliente.getTelefone().telefone(),
-                null,
                 cliente.getCriadoEm()
         );
     }

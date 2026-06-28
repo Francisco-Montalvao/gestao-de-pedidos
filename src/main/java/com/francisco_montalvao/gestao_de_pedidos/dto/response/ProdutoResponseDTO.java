@@ -8,7 +8,7 @@ public record ProdutoResponseDTO(
         String descricao,
         BigDecimal preco,
         Integer estoque,
-        Long categoriaId,
+        CategoriaSimplesDTO categoria,
         Boolean ativo
 ) {
 }

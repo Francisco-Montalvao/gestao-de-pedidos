@@ -6,23 +6,21 @@ import java.math.BigDecimal;
 
 public record ProdutoRequestDTO(
 
-
-        @NotBlank(message = "Nao pode estar vazio")
-        @Size(min = 3, message = "NomePessoa nao pode ter menos de 3 letras")
+        @NotBlank(message = "O nome é obrigatório.")
+        @Size(min = 3, message = "O nome deve ter no mínimo 3 caracteres.")
         String nome,
-
 
         String descricao,
 
-        @Positive(message = "Deve ser postivo")
+        @NotNull(message = "O preço é obrigatório.")
+        @Positive(message = "O preço deve ser maior que zero.")
         BigDecimal preco,
 
-
-        @PositiveOrZero(message = "Deve ser positivo")
+        @NotNull(message = "O estoque é obrigatório.")
+        @PositiveOrZero(message = "O estoque não pode ser negativo.")
         Integer estoque,
 
-        @NotNull(message = "Nao pode ser nulo")
+        @NotNull(message = "A categoria é obrigatória.")
         Long categoriaId
 ) {
-
 }
