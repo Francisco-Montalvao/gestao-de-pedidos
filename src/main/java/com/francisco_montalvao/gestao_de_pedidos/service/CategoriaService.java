@@ -5,6 +5,7 @@ import com.francisco_montalvao.gestao_de_pedidos.dto.request.CategoriaRequestDTO
 import com.francisco_montalvao.gestao_de_pedidos.dto.response.CategoriaResponseDTO;
 import com.francisco_montalvao.gestao_de_pedidos.exception.RegraNegocioException;
 import com.francisco_montalvao.gestao_de_pedidos.model.Categoria;
+import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.NomeProduto;
 import com.francisco_montalvao.gestao_de_pedidos.repository.CategoriaRespository;
 import com.francisco_montalvao.gestao_de_pedidos.repository.ProdutoRepository;
 import org.springframework.http.HttpStatus;
@@ -26,8 +27,10 @@ public class CategoriaService {
 
     @Transactional
     public CategoriaResponseDTO cadastrarCategoria(CategoriaRequestDTO requestDTO){
-        if (repository.existsByNome(requestDTO.nome())){
-            throw new RegraNegocioException("Já existe uma categoria cadastrada com esse nome", HttpStatus.CONFLICT);
+        NomeProduto categoria = new NomeProduto(requestDTO.nome());
+
+        if (repository.existsByNome(categoria) ){
+            throw new RegraNegocioException("Já existe uma categoria com o nome '" + requestDTO.nome() + "'.", HttpStatus.CONFLICT);
         }
         var cat = new Categoria(requestDTO.nome());
 
@@ -52,14 +55,14 @@ public class CategoriaService {
     public void deletarCategoria(Long id) {
         var cat = buscarPorId(id);
         if (produtoRepository.existsByCategoriaId(cat.getId())){
-            throw  new RegraNegocioException("Categoria com id "+ id +" possui produtos vinculados", HttpStatus.BAD_REQUEST);
+            throw new RegraNegocioException("Não é possível remover a categoria '" + cat.getNome().nome() + "' pois existem " + produtoRepository.countByCategoriaId(id) + " produto(s) vinculado(s).", HttpStatus.BAD_REQUEST);
         }
         repository.delete(cat);
     }
 
     private Categoria buscarPorId(Long id){
         return repository.findById(id).orElseThrow(
-                ()-> new RegraNegocioException("Categoria com id " + id + " nao cadastradada", HttpStatus.NOT_FOUND)
+                ()-> new RegraNegocioException("Categoria com id " + id + " não encontrada.", HttpStatus.NOT_FOUND)
         );
     }
 }

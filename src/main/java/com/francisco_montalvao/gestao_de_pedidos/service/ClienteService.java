@@ -4,6 +4,7 @@ import com.francisco_montalvao.gestao_de_pedidos.dto.request.ClienteRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.response.ClienteResponseDTO;
 import com.francisco_montalvao.gestao_de_pedidos.exception.RegraNegocioException;
 import com.francisco_montalvao.gestao_de_pedidos.model.Cliente;
+import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.Email;
 import com.francisco_montalvao.gestao_de_pedidos.repository.ClienteRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,16 @@ public class ClienteService {
 
     @Transactional
     public ClienteResponseDTO cadastrarCliente(ClienteRequestDTO request){
+        Email emailValue = new Email(request.email());
+
+        if (repository.existsByEmail(emailValue)){
+            throw new RegraNegocioException(
+                    "Já existe um cliente cadastrado com o e-mail '" + request.email() + "'.",
+                    HttpStatus.CONFLICT
+            );
+        }
+
+
         Cliente cliente = new Cliente(request.nome(), request.email(), request.telefone());
 
         Cliente clienteSalvo = repository.save(cliente);
@@ -51,7 +62,7 @@ public class ClienteService {
         Optional<Cliente> donoDoEmail = repository.findByEmail_Email(requestDTO.email());
 
         if (donoDoEmail.isPresent() && !donoDoEmail.get().getId().equals(id)) {
-            throw new RegraNegocioException("Este e-mail já está em uso por outro cliente", HttpStatus.BAD_REQUEST);
+            throw new RegraNegocioException("Já existe um cliente cadastrado com o e-mail '" + requestDTO.email() + "'.", HttpStatus.CONFLICT);
         }
 
         clienteAtual.atualizarNome(requestDTO.nome());
@@ -69,7 +80,7 @@ public class ClienteService {
         Cliente cliente = buscarCliente(id);
 
         if (!cliente.getPedidos().isEmpty()){
-            throw new RegraNegocioException("Cliente possui pedidos vinculados", HttpStatus.BAD_REQUEST);
+            throw new RegraNegocioException("Não é possível remover o cliente '" + cliente.getNomePessoa().nome() + "' pois ele possui " + cliente.getPedidos().size() + " pedido(s) registrado(s).", HttpStatus.BAD_REQUEST);
         }
 
         repository.delete(cliente);
@@ -79,7 +90,7 @@ public class ClienteService {
     private Cliente buscarCliente(Long id){
         return repository.findById(id)
                 .orElseThrow(
-                        ()-> new RegraNegocioException("clietne com id " + id + " nao encontrado", HttpStatus.NOT_FOUND )
+                        ()-> new RegraNegocioException("Cliente com id " + id + " não encontrado.", HttpStatus.NOT_FOUND )
                 );
     }
 }

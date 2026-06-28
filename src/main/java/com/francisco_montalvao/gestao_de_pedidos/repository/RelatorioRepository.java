@@ -16,7 +16,7 @@ public interface RelatorioRepository extends Repository<Pedido, Long> {
     @Query("""
                 SELECT p.status AS status,
                        COUNT(p.id) AS quantidade, 
-                       COALESCE(SUM(p.valorTotal), 0) AS receita
+                       COALESCE(SUM(CASE WHEN p.status = 'CANCELADO' THEN 0 ELSE p.valorTotal END), 0) AS receita
                 FROM Pedido p 
                 WHERE p.criadoEm >= :inicio AND p.criadoEm <= :fim 
                 GROUP BY p.status

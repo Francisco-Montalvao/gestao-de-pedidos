@@ -1,15 +1,14 @@
 package com.francisco_montalvao.gestao_de_pedidos.specification;
 
-import com.francisco_montalvao.gestao_de_pedidos.dto.request.PedidoFiltroRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.model.Pedido;
 import org.springframework.data.jpa.domain.Specification;
 
 public class PedidoSpecification {
 
-    public static Specification<Pedido> comFiltros(PedidoFiltroRequestDTO filtro) {
+    public static Specification<Pedido> comFiltros(String status, Long clienteId) {
         return
-                statusIgual(filtro.status())
-                        .and(clienteIdIgual(filtro.clienteId()));
+                statusIgual(status)
+                        .and(clienteIdIgual(clienteId));
     }
 
     private static Specification<Pedido> clienteIdIgual(Long clienteId) {

@@ -1,6 +1,5 @@
 package com.francisco_montalvao.gestao_de_pedidos.service;
 
-import com.francisco_montalvao.gestao_de_pedidos.dto.request.PedidoFiltroRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.request.PedidoRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.request.StatusRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.response.ClienteSimplificadoDTO;
@@ -12,12 +11,11 @@ import com.francisco_montalvao.gestao_de_pedidos.model.Cliente;
 import com.francisco_montalvao.gestao_de_pedidos.model.ItemPedido;
 import com.francisco_montalvao.gestao_de_pedidos.model.Pedido;
 import com.francisco_montalvao.gestao_de_pedidos.model.Produto;
+import com.francisco_montalvao.gestao_de_pedidos.model.enums.StatusPedido;
 import com.francisco_montalvao.gestao_de_pedidos.repository.ClienteRepository;
 import com.francisco_montalvao.gestao_de_pedidos.repository.PedidoRepository;
 import com.francisco_montalvao.gestao_de_pedidos.repository.ProdutoRepository;
 import com.francisco_montalvao.gestao_de_pedidos.specification.PedidoSpecification;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,28 +37,19 @@ public class PedidoService {
 
     @Transactional
     public PedidoResponseDTO cadastrarPedido(PedidoRequestDTO dto) {
-        if (dto == null) {
-            throw new RegraNegocioException(
-                    "Pedido inválido",
-                    HttpStatus.BAD_REQUEST);
-        }
-
         Cliente cliente = clienteRepository.findById(dto.clienteId())
                 .orElseThrow(() -> new RegraNegocioException(
                         "Cliente com id " + dto.clienteId() + " não encontrado",
                         HttpStatus.NOT_FOUND));
 
-        if (dto.itens() == null || dto.itens().isEmpty()) {
-            throw new RegraNegocioException(
-                    "O pedido deve possuir ao menos um item",
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
         Pedido pedido = new Pedido(cliente);
 
         for (var itemDto : dto.itens()) {
             var produto = buscarProdutoPorId(itemDto.produtoId());
+
+            if (!produto.getAtivo()) {
+                throw new RegraNegocioException("O produto '" + produto.getNome().nome() + "' está inativo e não pode ser adicionado ao pedido.", HttpStatus.BAD_REQUEST);
+            }
 
             produto.saidaEstoque(itemDto.quantidade());
 
@@ -87,10 +76,10 @@ public class PedidoService {
     }
 
 
-    public Page<PedidoResponseDTO> listarTodos(PedidoFiltroRequestDTO filtro, Pageable pageable) {
-        return repository
-                .findAll(PedidoSpecification.comFiltros(filtro), pageable)
-                .map(this::toResponseDto);
+    public List<PedidoResponseDTO> listarTodos(String status, Long clienteId) {
+        return repository.findAll(PedidoSpecification.comFiltros(status, clienteId)).stream()
+                .map(this::toResponseDto)
+                .toList();
 
     }
 
@@ -111,8 +100,14 @@ public class PedidoService {
 
 
     @Transactional
-    public void deletarPedido(Long id) {
+    public void cancelarPedido(Long id) {
         var pedido = buscarPedidoPorId(id);
+
+        if (!pedido.getStatus().podeTransicionarPara(StatusPedido.CANCELADO)) {
+            throw new IllegalArgumentException(
+                    "Transição inválida: pedido " + pedido.getStatus() + " não pode ser cancelado."
+            );
+        }
 
         pedido.avancarStatus("CANCELADO");
     }
@@ -120,7 +115,7 @@ public class PedidoService {
     private Pedido buscarPedidoPorId(Long id) {
         return repository.buscarPorIdComJpql(id)
                 .orElseThrow(
-                        () -> new RegraNegocioException("Pedido com " + id + " nao encontrado", HttpStatus.NOT_FOUND)
+                        () -> new RegraNegocioException("Pedido com id " + id + " não encontrado.", HttpStatus.NOT_FOUND)
                 );
     }
 
@@ -155,7 +150,7 @@ public class PedidoService {
 
     private Produto buscarProdutoPorId(Long id) {
         return produtoRepository.findById(id).orElseThrow(
-                () -> new RegraNegocioException("Produto com id " + id + " Inexistente", HttpStatus.NOT_FOUND)
+                () -> new RegraNegocioException("Produto com id " + id + " não encontrado.", HttpStatus.NOT_FOUND)
         );
     }
 }
