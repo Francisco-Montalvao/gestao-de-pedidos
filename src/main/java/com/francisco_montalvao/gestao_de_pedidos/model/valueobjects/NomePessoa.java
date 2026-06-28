@@ -1,24 +1,19 @@
 package com.francisco_montalvao.gestao_de_pedidos.model.valueobjects;
 
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 @Embeddable
-public record NomePessoa(
-        @Column(name = "nome", nullable = false)
-        String nome
-) {
+public record NomePessoa(String nome) {
 
-    public NomePessoa(String nome){
-        if (nome == null || nome.trim().length() < 3 || !nome.matches("^[A-Za-zÀ-ÿ ]+$")){
+    public NomePessoa {
 
-            throw new IllegalArgumentException(
-                    "NomePessoa " + nome +
-                            " deve conter apenas letras e ter no minimo 3 caracteres"
-            );
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException("O nome é obrigatório.");
         }
-        this.nome = nome;
+        if (!nome.matches("^[A-Za-zÀ-ÿ ]{2,}$")) {
+            throw new IllegalArgumentException("O nome deve ter no mínimo 2 caracteres.");
+        }
+        
     }
-
 }

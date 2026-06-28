@@ -3,9 +3,6 @@ package com.francisco_montalvao.gestao_de_pedidos.model;
 
 import com.francisco_montalvao.gestao_de_pedidos.model.enums.StatusPedido;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,9 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+import java.util.Objects;
 
 @Entity
 @Table(name = "pedidos")
@@ -45,6 +40,8 @@ public class Pedido {
     @UpdateTimestamp
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
+
+    protected Pedido(){};
 
     public Pedido (Cliente clinete){
         validarCliente(clinete);
@@ -96,10 +93,19 @@ public class Pedido {
         var status = StatusPedido.valueOf(novoStatus);
 
         if (!this.status.podeTransicionarPara(status)) {
+            if (this.status.obterProximosPassos().isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Transição inválida: pedido " + this.status + " não pode mudar de status."
+                );
+            }
+
+            String proximos = this.status.obterProximosPassos().stream()
+                    .map(Enum::name)
+                    .reduce((a, b) -> a + " ou " + b)
+                    .orElse("");
+
             throw new IllegalArgumentException(
-                    "Transição inválida: o pedido está " + this.status +
-                            " e não pode mudar para " + status +
-                            ". Os próximos passos permitidos são: " + this.status.obterProximosPassos()
+                    "Transição inválida: pedido " + this.status + " só pode ir para " + proximos + "."
             );
         }
 
@@ -111,4 +117,43 @@ public class Pedido {
         this.status = status;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public StatusPedido getStatus() {
+        return status;
+    }
+
+    public BigDecimal getValorTotal() {
+        return valorTotal;
+    }
+
+    public List<ItemPedido> getItensPedido() {
+        return itensPedido;
+    }
+
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
+    }
+
+    public LocalDateTime getAtualizadoEm() {
+        return atualizadoEm;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Pedido pedido = (Pedido) o;
+        return Objects.equals(id, pedido.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

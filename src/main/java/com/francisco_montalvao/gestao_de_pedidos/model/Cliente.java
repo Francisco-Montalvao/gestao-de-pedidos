@@ -5,18 +5,11 @@ import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.Email;
 import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.NomePessoa;
 import com.francisco_montalvao.gestao_de_pedidos.model.valueobjects.Telefone;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 
 @Entity
@@ -28,13 +21,15 @@ public class Cliente {
     private Long id;
 
     @Embedded
+    @AttributeOverride(name = "nome", column = @Column(name = "nome", nullable = false))
     private NomePessoa nomePessoa;
 
     @Embedded
-    @Column(name = "email", unique = true)
+    @AttributeOverride(name = "email", column = @Column(name = "email", unique = true, nullable = false))
     private Email email;
 
     @Embedded
+    @AttributeOverride(name = "telefone", column = @Column(name = "telefone", unique = true, nullable = false ))
     private Telefone telefone;
 
     @CreationTimestamp
@@ -50,6 +45,8 @@ public class Cliente {
         this.telefone = new Telefone(telefone);
     }
 
+    protected Cliente(){}
+
     public void atualizarNome(String novoNome) {
         this.nomePessoa = new NomePessoa(novoNome);
     }
@@ -60,5 +57,29 @@ public class Cliente {
 
     public void atualizarTelefone(String novoTelefone) {
         this.telefone = new Telefone(novoTelefone);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public NomePessoa getNomePessoa() {
+        return nomePessoa;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public Telefone getTelefone() {
+        return telefone;
+    }
+
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
+    }
+
+    public List<Pedido> getPedidos() {
+        return pedidos;
     }
 }
