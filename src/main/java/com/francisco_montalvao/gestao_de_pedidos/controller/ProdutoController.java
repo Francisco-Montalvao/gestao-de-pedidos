@@ -1,12 +1,10 @@
 package com.francisco_montalvao.gestao_de_pedidos.controller;
 
-import com.francisco_montalvao.gestao_de_pedidos.dto.request.FiltroCategoriaRequestDTO;
+import com.francisco_montalvao.gestao_de_pedidos.dto.request.EntradaEstoqueDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.request.ProdutoRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.response.ProdutoResponseDTO;
 import com.francisco_montalvao.gestao_de_pedidos.service.ProdutoService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,11 +35,10 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public Page<ProdutoResponseDTO> listarTodosProdutos(
-            FiltroCategoriaRequestDTO filtro,
-            Pageable pageable) {
+    public ResponseEntity<java.util.List<ProdutoResponseDTO>> listarTodosProdutos(
+            @RequestParam(required = false, name = "categoria_id") Long categoriaId) {
 
-        return service.listarTodos(filtro, pageable);
+        return ResponseEntity.ok(service.listarTodos(categoriaId));
     }
 
     @GetMapping("/{id}")
@@ -56,10 +53,23 @@ public class ProdutoController {
             @PathVariable
             Long id,
             @RequestBody
+            @Valid
             ProdutoRequestDTO dto) {
         var response = service.atualizarProduto(id, dto);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}/entrada-estoque")
+    public ResponseEntity<Void> adicionarEstoque (
+            @PathVariable Long id,
+            @RequestBody
+            @Valid
+            EntradaEstoqueDTO request){
+
+        service.adicionarEstoque(id, request.quantidadeEntrada());
+
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

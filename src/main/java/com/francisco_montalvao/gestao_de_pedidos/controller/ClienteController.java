@@ -31,17 +31,7 @@ public class ClienteController {
                 .buildAndExpand(response.id())
                 .toUri();
 
-        var responseComPath = new
-                ClienteResponseDTO(
-                response.id(),
-                response.nome(),
-                response.email(),
-                response.telefone(),
-                uri.toString(),
-                response.criadoEm()
-        );
-
-        return ResponseEntity.created(uri).body(responseComPath);
+        return ResponseEntity.created(uri).body(response);
     }
 
     @GetMapping

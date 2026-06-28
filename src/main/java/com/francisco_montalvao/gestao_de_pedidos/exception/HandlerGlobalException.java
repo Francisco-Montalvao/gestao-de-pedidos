@@ -6,12 +6,13 @@ import com.francisco_montalvao.gestao_de_pedidos.dto.erro.Erros;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @ControllerAdvice
 public class HandlerGlobalException {
@@ -21,8 +22,8 @@ public class HandlerGlobalException {
         ErroPadrao erroPadrao = new ErroPadrao(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Erro de validacao em campos",
-                http.getRequestURI(),
+                "Erro de validação em campos",
+                null,
                 ex.getBindingResult().getFieldErrors()
                         .stream()
                         .map(
@@ -39,11 +40,12 @@ public class HandlerGlobalException {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErroPadrao> errosDeDominio (IllegalArgumentException ex, HttpServletRequest http){
+
         ErroPadrao erroPadrao = new ErroPadrao(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 ex.getMessage(),
-                http.getRequestURI(),
+                null,
                 null
         );
 
@@ -51,17 +53,36 @@ public class HandlerGlobalException {
     }
 
     @ExceptionHandler(RegraNegocioException.class)
-    public ResponseEntity<?> regraDeNegocio(RegraNegocioException ex, HttpServletRequest http){
+    public ResponseEntity<ErroPadrao> regraDeNegocio(RegraNegocioException ex, HttpServletRequest http){
         ErroPadrao erroPadrao = new ErroPadrao(
                 LocalDateTime.now(),
                 ex.getStatus().value(),
                 ex.getMessage(),
-                http.getRequestURI(),
+                null,
                 null
         );
 
         return ResponseEntity.status(ex.getStatus()).body(erroPadrao);
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErroPadrao> parametrosObrigatoriosRelatorio(MissingServletRequestParameterException ex) {
+        String parametro = ex.getParameterName();
+        String mensagem = "Required request parameter '" + parametro + "' is not present";
+
+        if ("data_inicio".equals(parametro) || "data_fim".equals(parametro)) {
+            mensagem = "Os parâmetros 'data_inicio' e 'data_fim' são obrigatórios.";
+        }
+
+        ErroPadrao erroPadrao = new ErroPadrao(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                mensagem,
+                null,
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erroPadrao);
+    }
 
 }

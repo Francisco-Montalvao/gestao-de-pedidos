@@ -23,18 +23,20 @@ public class CategoriaController {
 
 
     @PostMapping
-    public ResponseEntity<CategoriaResponseDTO> cadastrarCategoria(@RequestBody @Valid CategoriaRequestDTO dto, UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<CategoriaResponseDTO> cadastrarCategoria(
+            @RequestBody
+            @Valid
+            CategoriaRequestDTO dto,
+            UriComponentsBuilder uriComponentsBuilder) {
         var response = service.cadastrarCategoria(dto);
 
         URI uri = uriComponentsBuilder
                 .path("/{id}")
                 .buildAndExpand(response.id())
                 .toUri();
-
         return ResponseEntity.created(uri).body(response);
 
     }
-
 
     @GetMapping
     public ResponseEntity<List<CategoriaResponseDTO>> listarCategorias (){

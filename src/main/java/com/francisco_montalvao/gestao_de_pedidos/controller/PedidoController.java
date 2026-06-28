@@ -1,15 +1,12 @@
 package com.francisco_montalvao.gestao_de_pedidos.controller;
 
 
-import com.francisco_montalvao.gestao_de_pedidos.dto.request.PedidoFiltroRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.request.PedidoRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.request.StatusRequestDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.response.PedidoResponseDTO;
 import com.francisco_montalvao.gestao_de_pedidos.dto.response.StatusResponseDTO;
 import com.francisco_montalvao.gestao_de_pedidos.service.PedidoService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -43,8 +40,10 @@ public class PedidoController {
     }
 
     @GetMapping
-    public Page<PedidoResponseDTO> listarTodos (PedidoFiltroRequestDTO filtro, Pageable pageable){
-        return service.listarTodos(filtro, pageable);
+    public ResponseEntity<List<PedidoResponseDTO>> listarTodos (
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false, name = "cliente_id") Long clienteId){
+        return ResponseEntity.ok(service.listarTodos(status, clienteId));
     }
 
     @GetMapping("/{id}")
@@ -53,8 +52,8 @@ public class PedidoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarPedido (@PathVariable Long id){
-        service.deletarPedido(id);
+    public ResponseEntity<Void> cancelarPedido (@PathVariable Long id){
+        service.cancelarPedido(id);
 
         return ResponseEntity.noContent().build();
     }
@@ -65,4 +64,3 @@ public class PedidoController {
         return ResponseEntity.ok(status);
     }
 }
-
